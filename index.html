@@ -1,0 +1,1123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MediCare HMS — Clinic Register</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:        #f0f4f8;
+    --white:     #ffffff;
+    --border:    #d6e4ef;
+    --border2:   #c2d6e8;
+    --blue:      #1a6fa8;
+    --blue-lt:   #e8f3fb;
+    --teal:      #0f8a7e;
+    --teal-lt:   #e4f5f3;
+    --red:       #c0392b;
+    --red-lt:    #fdecea;
+    --green:     #1a7a4a;
+    --green-lt:  #e5f5ec;
+    --amber:     #b06a00;
+    --amber-lt:  #fff8ed;
+    --purple:    #7c3db8;
+    --text:      #1c2b3a;
+    --muted:     #6a859c;
+    --muted2:    #94adc0;
+    --mono:      'DM Mono', monospace;
+    --sans:      'Outfit', sans-serif;
+    --serif:     'DM Serif Display', serif;
+    --shadow:    0 2px 12px rgba(26,111,168,.08);
+    --shadow-lg: 0 8px 32px rgba(26,111,168,.14);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 0 64px;
+    overflow-x: hidden;
+  }
+
+  /* watermark cross */
+  body::before {
+    content: '✚';
+    position: fixed;
+    font-size: 520px;
+    color: rgba(26,111,168,.025);
+    top: -80px; right: -60px;
+    pointer-events: none;
+    z-index: 0;
+    line-height: 1;
+  }
+
+  /* top accent stripe */
+  .top-stripe {
+    width: 100%;
+    height: 5px;
+    background: linear-gradient(90deg, #1a6fa8 0%, #0f8a7e 55%, #3d8fc4 100%);
+    flex-shrink: 0;
+  }
+
+  /* ── MASTHEAD ── */
+  .masthead {
+    width: 100%;
+    background: var(--white);
+    border-bottom: 1px solid var(--border);
+    padding: 18px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    position: relative;
+    z-index: 2;
+    box-shadow: var(--shadow);
+  }
+
+  .logo-area { display: flex; align-items: center; gap: 14px; }
+
+  .logo-icon {
+    width: 46px; height: 46px;
+    background: var(--blue);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-size: 22px;
+    box-shadow: 0 3px 12px rgba(26,111,168,.3);
+    flex-shrink: 0;
+  }
+
+  .logo-name {
+    font-family: var(--serif);
+    font-size: 1.5rem;
+    color: var(--blue);
+    line-height: 1;
+  }
+
+  .logo-sub {
+    font-size: 10.5px;
+    color: var(--muted);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-top: 3px;
+  }
+
+  .live-badge {
+    display: flex; align-items: center; gap: 7px;
+    background: var(--blue-lt);
+    border: 1px solid #b8d9ef;
+    border-radius: 999px;
+    padding: 5px 14px;
+    font-size: 12px; color: var(--blue); font-weight: 500;
+  }
+
+  .pulse-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--teal);
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%,100% { opacity:1; transform:scale(1); }
+    50%      { opacity:.4; transform:scale(.65); }
+  }
+
+  /* ── CONTAINER ── */
+  .container {
+    position: relative; z-index: 1;
+    width: 100%; max-width: 900px;
+    padding: 26px 20px 0;
+    display: flex; flex-direction: column; gap: 16px;
+    animation: fadeUp .5s ease both;
+  }
+
+  @keyframes fadeUp {
+    from { opacity:0; transform:translateY(18px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+
+  /* ── STATS ROW ── */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(4,1fr);
+    gap: 12px;
+  }
+
+  .stat-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 18px;
+    box-shadow: var(--shadow);
+    display: flex; flex-direction: column; gap: 5px;
+    transition: box-shadow .2s, border-color .2s;
+    position: relative; overflow: hidden;
+  }
+
+  .stat-card::before {
+    content: '';
+    position: absolute; top:0; left:0; right:0; height:3px;
+    border-radius: 12px 12px 0 0;
+  }
+
+  .stat-card:nth-child(1)::before { background: var(--blue); }
+  .stat-card:nth-child(2)::before { background: var(--teal); }
+  .stat-card:nth-child(3)::before { background: var(--amber); }
+  .stat-card:nth-child(4)::before { background: var(--purple); }
+  .stat-card:hover { box-shadow: var(--shadow-lg); border-color: var(--border2); }
+
+  .stat-label {
+    font-size: 10px; letter-spacing: 2px;
+    color: var(--muted); text-transform: uppercase; font-weight: 500;
+  }
+
+  .stat-value {
+    font-family: var(--serif);
+    font-size: 2rem; line-height: 1;
+  }
+
+  .sv-blue   { color: var(--blue); }
+  .sv-teal   { color: var(--teal); }
+  .sv-amber  { color: var(--amber); }
+  .sv-purple { color: var(--purple); }
+
+  /* ── MAIN PANEL ── */
+  .main-panel {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 16px; overflow: hidden;
+    box-shadow: var(--shadow);
+  }
+
+  .panel-titlebar {
+    padding: 12px 20px;
+    border-bottom: 1px solid var(--border);
+    background: #f7fafd;
+    display: flex; align-items: center; gap: 10px;
+  }
+
+  .tbar-dots { display: flex; gap: 6px; }
+  .dot { width:10px; height:10px; border-radius:50%; }
+  .dot-r { background:#e88080; }
+  .dot-y { background:#e8c080; }
+  .dot-g { background:#80c880; }
+
+  .tbar-label {
+    font-family: var(--mono);
+    font-size: 11px; letter-spacing: 1.5px;
+    color: var(--muted); text-transform: uppercase;
+    margin-left: 6px;
+  }
+
+  #terminal {
+    height: 440px;
+    overflow-y: auto;
+    padding: 20px 24px;
+    font-family: var(--mono);
+    font-size: 13px; line-height: 1.85;
+    background: #fafcfe;
+    scroll-behavior: smooth;
+  }
+
+  #terminal::-webkit-scrollbar { width: 5px; }
+  #terminal::-webkit-scrollbar-track { background: transparent; }
+  #terminal::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+
+  .line { display:block; animation: ln .1s ease both; }
+  @keyframes ln {
+    from { opacity:0; transform:translateX(-4px); }
+    to   { opacity:1; transform:translateX(0); }
+  }
+
+  .lo  { color: var(--text); }
+  .lh  { color: var(--blue); font-weight: 500; }
+  .le  { color: var(--red); }
+  .lok { color: var(--green); }
+  .li  { color: var(--muted2); font-style: italic; }
+
+  /* ── QUICK ACTIONS ── */
+  .action-bar {
+    display: flex; gap: 7px; flex-wrap: wrap;
+    padding: 13px 20px;
+    border-top: 1px solid var(--border);
+    background: #f7fafd;
+  }
+
+  .qbtn {
+    background: var(--white);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    border-radius: 8px;
+    padding: 7px 13px;
+    font-family: var(--sans); font-size: 12px; font-weight: 500;
+    cursor: pointer;
+    transition: all .16s;
+  }
+
+  .qbtn:hover {
+    border-color: var(--blue);
+    color: var(--blue);
+    background: var(--blue-lt);
+    box-shadow: 0 2px 8px rgba(26,111,168,.1);
+  }
+
+  .qbtn.qred { border-color:#e8c0c0; color:var(--red); }
+  .qbtn.qred:hover { background:var(--red-lt); border-color:var(--red); }
+
+  /* ── INPUT BAR ── */
+  .input-bar {
+    display: flex; align-items: stretch;
+    border: 1.5px solid var(--border2);
+    border-radius: 12px; overflow: hidden;
+    background: var(--white);
+    box-shadow: var(--shadow);
+    transition: border-color .2s, box-shadow .2s;
+  }
+
+  .input-bar:focus-within {
+    border-color: var(--blue);
+    box-shadow: 0 0 0 3px rgba(26,111,168,.1);
+  }
+
+  .input-prefix {
+    display: flex; align-items: center;
+    padding: 0 16px;
+    background: var(--blue-lt);
+    border-right: 1px solid var(--border2);
+    font-family: var(--mono); font-size: 11px;
+    letter-spacing: 1px; color: var(--blue); font-weight: 600;
+    white-space: nowrap; min-height: 48px;
+  }
+
+  #user-input {
+    flex:1; background:transparent; border:none; outline:none;
+    color: var(--text); font-family: var(--mono);
+    font-size: 13.5px; padding: 13px 16px;
+    caret-color: var(--blue);
+  }
+
+  #user-input::placeholder { color: var(--muted2); font-size: 12px; }
+
+  #send-btn {
+    background: var(--blue); color: white;
+    border: none; border-left: 1px solid #1560a0;
+    padding: 0 26px;
+    font-family: var(--sans); font-size: 13px; font-weight: 600;
+    cursor: pointer; letter-spacing: .4px;
+    transition: background .16s; white-space: nowrap;
+  }
+
+  #send-btn:hover   { background: #135d91; }
+  #send-btn:active  { background: #0f4e7a; }
+  #send-btn:disabled { opacity:.35; cursor:not-allowed; }
+
+  /* ── MENU CARD ── */
+  .menu-card {
+    display: block;
+    border: 1px solid var(--border);
+    border-radius: 12px; overflow: hidden;
+    max-width: 520px; margin: 12px 0;
+    box-shadow: var(--shadow);
+    animation: ln .2s ease both;
+  }
+
+  .menu-hdr {
+    background: var(--blue); color: white;
+    padding: 11px 18px;
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 13px; font-weight: 600; letter-spacing: .4px;
+  }
+
+  .menu-hint-txt {
+    font-size: 10px; opacity:.7;
+    font-family: var(--mono); font-weight: 400;
+  }
+
+  .menu-list { display:flex; flex-direction:column; background:var(--white); }
+
+  .mi {
+    display: flex; align-items: center; gap: 13px;
+    padding: 11px 18px;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer; transition: background .13s;
+  }
+
+  .mi:last-child { border-bottom: none; }
+  .mi:hover { background: var(--blue-lt); }
+  .mi:hover .mn { background:var(--blue); color:white; border-color:var(--blue); }
+
+  .mn {
+    width: 28px; height: 28px; border-radius: 7px;
+    background: var(--blue-lt);
+    border: 1px solid var(--border2);
+    color: var(--blue);
+    font-family: var(--mono); font-size: 12px; font-weight: 700;
+    display: flex; align-items:center; justify-content:center;
+    flex-shrink:0; transition: all .13s;
+  }
+
+  .ml { font-size:13px; color:var(--text); }
+  .ml-sub { font-size:10.5px; color:var(--muted); margin-top:1px; }
+
+  .mi-exit { border-top: 1px solid var(--border); }
+  .mi-exit .mn { color:var(--red); border-color:#e8c0c0; background:var(--red-lt); }
+  .mi-exit .ml { color:var(--muted); }
+  .mi-exit:hover { background:var(--red-lt); }
+  .mi-exit:hover .mn { background:var(--red); color:white; border-color:var(--red); }
+
+  /* ── PATIENT CARD ── */
+  .patient-card {
+    display: block;
+    border: 1px solid var(--border);
+    border-radius: 12px; overflow: hidden;
+    max-width: 460px; margin: 12px 0;
+    box-shadow: var(--shadow);
+    animation: ln .18s ease both;
+  }
+
+  .pc-header {
+    background: var(--blue); color: white;
+    padding: 11px 18px;
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 13px; font-weight: 600;
+  }
+
+  .pc-id-badge {
+    background: rgba(255,255,255,.18);
+    border-radius: 6px; padding: 3px 10px;
+    font-family: var(--mono); font-size: 12px;
+  }
+
+  .pc-body {
+    background: var(--white); padding: 15px 18px;
+    display: grid; grid-template-columns: auto 1fr;
+    gap: 8px 20px; font-size: 12.5px;
+  }
+
+  .pc-label {
+    color: var(--muted); text-transform: uppercase;
+    letter-spacing: 1px; font-size: 10px;
+    font-family: var(--mono); padding-top: 2px;
+  }
+
+  .pc-value { color: var(--text); font-weight: 600; font-family: var(--mono); }
+  .cv-id     { color: var(--blue); font-size: 1.08em; }
+  .cv-name   { color: var(--teal); }
+  .cv-visits { color: var(--amber); }
+
+  .pc-footer {
+    background: var(--blue-lt);
+    border-top: 1px solid var(--border);
+    padding: 8px 18px; font-size: 11px;
+    color: var(--blue);
+    display: flex; justify-content: space-between;
+    font-family: var(--mono);
+  }
+
+  /* ── VISIT CARD ── */
+  .visit-card {
+    display: block;
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--teal);
+    border-radius: 10px; overflow: hidden;
+    max-width: 520px; margin: 8px 0;
+    box-shadow: var(--shadow);
+    animation: ln .18s ease both;
+  }
+
+  .vc-header {
+    background: var(--teal-lt);
+    border-bottom: 1px solid var(--border);
+    padding: 9px 16px;
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 12px; font-weight: 600;
+    color: var(--teal);
+    font-family: var(--mono);
+  }
+
+  .vc-body {
+    background: var(--white); padding: 13px 16px;
+    display: grid; grid-template-columns: auto 1fr;
+    gap: 7px 18px; font-size: 12.5px;
+  }
+
+  .vc-label {
+    color: var(--muted); text-transform: uppercase;
+    letter-spacing: 1px; font-size: 10px;
+    font-family: var(--mono); padding-top: 2px;
+  }
+
+  .vc-value { color: var(--text); font-weight: 500; font-family: var(--mono); }
+  .vv-diag  { color: var(--blue); }
+  .vv-rx    { color: var(--amber); }
+
+  /* ── TABLES ── */
+  .t-block {
+    display: block; margin: 12px 0;
+    border-radius: 10px; overflow: hidden;
+    border: 1px solid var(--border);
+    animation: ln .15s ease both;
+    max-width: 700px;
+  }
+
+  .t-block table {
+    width: 100%; border-collapse: collapse;
+    font-family: var(--mono); font-size: 12.5px;
+  }
+
+  .t-block th {
+    background: var(--blue-lt);
+    color: var(--blue);
+    text-transform: uppercase; letter-spacing: 1.2px;
+    font-size: 10.5px; padding: 10px 14px;
+    border-bottom: 1px solid var(--border2);
+    text-align: left; font-weight: 600; white-space: nowrap;
+  }
+
+  .t-block td {
+    padding: 9px 14px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text); background: var(--white); white-space: nowrap;
+  }
+
+  .t-block tr:last-child td { border-bottom: none; }
+  .t-block tr:hover td { background: var(--blue-lt); }
+
+  .td-pid    { color: var(--blue); font-weight: 700; }
+  .td-name   { color: var(--teal); font-weight: 600; }
+  .td-visits { color: var(--amber); font-weight: 700; }
+
+  /* section label */
+  .section-lbl {
+    display: block;
+    font-size: 10.5px; letter-spacing: 2px;
+    color: var(--muted); text-transform: uppercase;
+    font-family: var(--mono); margin: 14px 0 6px;
+  }
+
+  .pg-footer {
+    width: 100%; text-align: center;
+    margin-top: 32px;
+    font-size: 11px; color: var(--muted2);
+    letter-spacing: 1px; font-family: var(--mono);
+  }
+
+  @media (max-width:600px) {
+    .stats-row { grid-template-columns: repeat(2,1fr); }
+    .masthead  { padding: 14px 18px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="top-stripe"></div>
+
+<div class="masthead">
+  <div class="logo-area">
+    <div class="logo-icon">✚</div>
+    <div>
+      <div class="logo-name">MediCare HMS</div>
+      <div class="logo-sub">Clinic Register — Patient &amp; Visit Tracker</div>
+    </div>
+  </div>
+  <div class="live-badge">
+    <span class="pulse-dot"></span>
+    System Online
+  </div>
+</div>
+
+<div class="container">
+
+  <div class="stats-row">
+    <div class="stat-card">
+      <span class="stat-label">Registered Patients</span>
+      <span class="stat-value sv-blue" id="stat-patients">0</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-label">Total Visits</span>
+      <span class="stat-value sv-teal" id="stat-visits">0</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-label">Visits This Month</span>
+      <span class="stat-value sv-amber" id="stat-monthly">0</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-label">Frequent Patients (&gt;3)</span>
+      <span class="stat-value sv-purple" id="stat-frequent">0</span>
+    </div>
+  </div>
+
+  <div class="main-panel">
+    <div class="panel-titlebar">
+      <div class="tbar-dots">
+        <span class="dot dot-r"></span>
+        <span class="dot dot-y"></span>
+        <span class="dot dot-g"></span>
+      </div>
+      <span class="tbar-label">HospitalSystem.cpp — Session Active</span>
+    </div>
+    <div id="terminal"></div>
+    <div class="action-bar">
+      <button class="qbtn" onclick="quickSend('1')">① Register Patient</button>
+      <button class="qbtn" onclick="quickSend('2')">② Add Visit</button>
+      <button class="qbtn" onclick="quickSend('3')">③ Search Patient</button>
+      <button class="qbtn" onclick="quickSend('4')">④ Frequent Visitors</button>
+      <button class="qbtn" onclick="quickSend('5')">⑤ Monthly Report</button>
+      <button class="qbtn qred" onclick="quickSend('0')">⏻ Exit</button>
+    </div>
+  </div>
+
+  <div class="input-bar">
+    <div class="input-prefix">INPUT</div>
+    <input id="user-input" type="text" placeholder="Type your choice or value and press Enter…" autofocus />
+    <button id="send-btn">Submit ↵</button>
+  </div>
+
+  <div class="pg-footer">MediCare HMS v1.0 &nbsp;·&nbsp; DA1 C++ Mini Project &nbsp;·&nbsp; class Patient · class Visit · class HospitalSystem · vector · file handling</div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+//  DATA  (mirrors: class Patient, class Visit)
+// ═══════════════════════════════════════════════════════
+// Patient  { patientID, name, age, phone }
+// Visit    { patientID, date, diagnosis, prescription }
+
+let patients = [];   // vector<Patient>
+let visits   = [];   // vector<Visit>
+
+// ═══════════════════════════════════════════════════════
+//  TERMINAL HELPERS
+// ═══════════════════════════════════════════════════════
+const terminal = document.getElementById('terminal');
+const inputEl  = document.getElementById('user-input');
+const sendBtn  = document.getElementById('send-btn');
+
+function print(text, cls='lo') {
+  text.split('\n').forEach(line => {
+    const s = document.createElement('span');
+    s.className = 'line ' + cls;
+    s.textContent = line;
+    terminal.appendChild(s);
+  });
+  terminal.scrollTop = terminal.scrollHeight;
+  updateStats();
+}
+
+const pH  = t => print(t, 'lh');
+const pE  = t => print(t, 'le');
+const pOK = t => print(t, 'lok');
+
+// ═══════════════════════════════════════════════════════
+//  LIVE STATS
+// ═══════════════════════════════════════════════════════
+const FREQUENT_THRESHOLD = 3;
+
+function updateStats() {
+  document.getElementById('stat-patients').textContent = patients.length;
+  document.getElementById('stat-visits').textContent   = visits.length;
+
+  const now   = new Date();
+  const month = now.getMonth();
+  const year  = now.getFullYear();
+
+  const monthly = visits.filter(v => {
+    const d = new Date(v.date);
+    return d.getMonth() === month && d.getFullYear() === year;
+  }).length;
+  document.getElementById('stat-monthly').textContent = monthly;
+
+  const frequent = patients.filter(p =>
+    visits.filter(v => v.patientID === p.patientID).length > FREQUENT_THRESHOLD
+  ).length;
+  document.getElementById('stat-frequent').textContent = frequent;
+}
+
+// ═══════════════════════════════════════════════════════
+//  STATE MACHINE
+// ═══════════════════════════════════════════════════════
+let state    = 'MENU';
+let subState = null;
+let tempData = {};
+
+function handleInput(raw) {
+  const val = raw.trim();
+  if (!val) return;
+
+  const echo = document.createElement('span');
+  echo.className = 'line li';
+  echo.textContent = '▷ ' + val;
+  terminal.appendChild(echo);
+  terminal.scrollTop = terminal.scrollHeight;
+
+  if      (state === 'MENU')     handleMenu(val);
+  else if (state === 'REGISTER') handleRegister(val);
+  else if (state === 'VISIT')    handleVisit(val);
+  else if (state === 'SEARCH')   handleSearch(val);
+  else if (state === 'FREQUENT') handleFrequent(val);
+}
+
+// ═══════════════════════════════════════════════════════
+//  MENU
+// ═══════════════════════════════════════════════════════
+function showMenu() {
+  const m = document.createElement('div');
+  m.className = 'menu-card';
+  m.innerHTML = `
+    <div class="menu-hdr">
+      <span>✚ MAIN MENU — Clinic Register</span>
+      <span class="menu-hint-txt">click or type number + Enter</span>
+    </div>
+    <div class="menu-list">
+      <div class="mi" onclick="quickSend('1')">
+        <span class="mn">1</span>
+        <div>
+          <div class="ml">Register New Patient</div>
+          <div class="ml-sub">Add PatientID · Name · Age · Phone</div>
+        </div>
+      </div>
+      <div class="mi" onclick="quickSend('2')">
+        <span class="mn">2</span>
+        <div>
+          <div class="ml">Add Visit Record</div>
+          <div class="ml-sub">Date · Diagnosis · Prescription Note</div>
+        </div>
+      </div>
+      <div class="mi" onclick="quickSend('3')">
+        <span class="mn">3</span>
+        <div>
+          <div class="ml">Search Patient &amp; Visit History</div>
+          <div class="ml-sub">Lookup by Patient ID — shows full visit log</div>
+        </div>
+      </div>
+      <div class="mi" onclick="quickSend('4')">
+        <span class="mn">4</span>
+        <div>
+          <div class="ml">Frequent Visitors Report</div>
+          <div class="ml-sub">List patients with more than N visits</div>
+        </div>
+      </div>
+      <div class="mi" onclick="quickSend('5')">
+        <span class="mn">5</span>
+        <div>
+          <div class="ml">Monthly Visits Report</div>
+          <div class="ml-sub">Total visits recorded this calendar month</div>
+        </div>
+      </div>
+      <div class="mi mi-exit" onclick="quickSend('0')">
+        <span class="mn">0</span>
+        <div><div class="ml">Exit System</div></div>
+      </div>
+    </div>`;
+  terminal.appendChild(m);
+  terminal.scrollTop = terminal.scrollHeight;
+}
+
+function handleMenu(val) {
+  const c = parseInt(val);
+  if (isNaN(c)) { pE('Invalid input. Enter 0–5.'); showMenu(); return; }
+  switch (c) {
+    case 1:
+      state = 'REGISTER'; subState = 'ID'; tempData = {};
+      print('');
+      pH('— Register New Patient ——————————————————————');
+      print('Enter Patient ID (numeric, must be unique):');
+      break;
+    case 2:
+      state = 'VISIT'; subState = 'PID'; tempData = {};
+      print('');
+      pH('— Add Visit Record ——————————————————————————');
+      print('Enter Patient ID:');
+      break;
+    case 3:
+      state = 'SEARCH'; subState = 'PID'; tempData = {};
+      print('');
+      pH('— Search Patient & Visit History ————————————');
+      print('Enter Patient ID to search:');
+      break;
+    case 4:
+      state = 'FREQUENT'; subState = 'N'; tempData = {};
+      print('');
+      pH('— Frequent Visitors Report ——————————————————');
+      print('Enter minimum number of visits N (patients with > N visits will be listed):');
+      break;
+    case 5:
+      monthlyReport();
+      showMenu();
+      break;
+    case 0:
+      pOK('');
+      pOK('  Session closed. Thank you for using MediCare HMS. 👋');
+      inputEl.disabled = true; sendBtn.disabled = true;
+      break;
+    default:
+      pE('Invalid choice. Enter 0–5.'); showMenu();
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+//  1. REGISTER PATIENT
+// ═══════════════════════════════════════════════════════
+function handleRegister(val) {
+  if (subState === 'ID') {
+    const id = val.trim();
+    if (!id || isNaN(id) || id.includes('.')) {
+      pE('Patient ID must be a whole number.'); print('Enter Patient ID:'); return;
+    }
+    if (patients.find(p => p.patientID === id)) {
+      pE('ERROR: Patient ID ' + id + ' already exists. Patient IDs must be unique.');
+      state = 'MENU'; showMenu(); return;
+    }
+    tempData.patientID = id;
+    subState = 'NAME';
+    print('Enter Patient Name:');
+
+  } else if (subState === 'NAME') {
+    const name = val.trim();
+    if (!name) { pE('Name cannot be empty.'); print('Enter Patient Name:'); return; }
+    if (/\d/.test(name)) { pE('Name must not contain digits.'); print('Enter Patient Name:'); return; }
+    tempData.name = name;
+    subState = 'AGE';
+    print('Enter Patient Age:');
+
+  } else if (subState === 'AGE') {
+    const age = parseInt(val);
+    if (isNaN(age) || age < 0 || age > 130) {
+      pE('Invalid age. Must be 0–130.'); print('Enter Patient Age:'); return;
+    }
+    tempData.age = age;
+    subState = 'PHONE';
+    print('Enter Phone Number (digits only):');
+
+  } else if (subState === 'PHONE') {
+    const phone = val.trim();
+    if (!/^\d{7,15}$/.test(phone)) {
+      pE('Invalid phone. Must be 7–15 digits only.'); print('Enter Phone Number:'); return;
+    }
+    tempData.phone = phone;
+
+    patients.push({
+      patientID: tempData.patientID,
+      name:      tempData.name,
+      age:       tempData.age,
+      phone:     tempData.phone
+    });
+
+    const card = document.createElement('div');
+    card.className = 'patient-card';
+    card.innerHTML = `
+      <div class="pc-header">
+        <span>✚ Patient Registered Successfully</span>
+        <span class="pc-id-badge">PID #${tempData.patientID}</span>
+      </div>
+      <div class="pc-body">
+        <span class="pc-label">Patient ID</span>  <span class="pc-value cv-id">${tempData.patientID}</span>
+        <span class="pc-label">Name</span>         <span class="pc-value cv-name">${tempData.name}</span>
+        <span class="pc-label">Age</span>          <span class="pc-value">${tempData.age} yrs</span>
+        <span class="pc-label">Phone</span>        <span class="pc-value">${tempData.phone}</span>
+      </div>
+      <div class="pc-footer">
+        <span>Status: REGISTERED ✓</span>
+        <span>Visit History: 0 records</span>
+      </div>`;
+    terminal.appendChild(card);
+    terminal.scrollTop = terminal.scrollHeight;
+    updateStats();
+    state = 'MENU'; showMenu();
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+//  2. ADD VISIT RECORD
+// ═══════════════════════════════════════════════════════
+function handleVisit(val) {
+  if (subState === 'PID') {
+    const id = val.trim();
+    const patient = patients.find(p => p.patientID === id);
+    if (!patient) {
+      pE('ERROR: Patient ID ' + id + ' not found. Cannot add a visit for a non-registered patient.');
+      state = 'MENU'; showMenu(); return;
+    }
+    tempData.patientID   = id;
+    tempData.patientName = patient.name;
+    subState = 'DATE';
+    pOK('Patient found: ' + patient.name + ' (Age: ' + patient.age + ')');
+    print('Enter Visit Date (YYYY-MM-DD) — or press Enter for today:');
+
+  } else if (subState === 'DATE') {
+    let date = val.trim();
+    if (!date) date = new Date().toISOString().slice(0, 10);
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+      pE('Invalid format. Use YYYY-MM-DD (e.g. 2025-07-15).');
+      print('Enter Visit Date:'); return;
+    }
+    tempData.date = date;
+    subState = 'DIAG';
+    print('Enter Diagnosis:');
+
+  } else if (subState === 'DIAG') {
+    const diag = val.trim();
+    if (!diag) { pE('Diagnosis cannot be empty.'); print('Enter Diagnosis:'); return; }
+    tempData.diagnosis = diag;
+    subState = 'RX';
+    print('Enter Prescription Note:');
+
+  } else if (subState === 'RX') {
+    const rx = val.trim();
+    if (!rx) { pE('Prescription note cannot be empty.'); print('Enter Prescription Note:'); return; }
+    tempData.prescription = rx;
+
+    const visitNum = visits.filter(v => v.patientID === tempData.patientID).length + 1;
+    visits.push({
+      patientID:    tempData.patientID,
+      date:         tempData.date,
+      diagnosis:    tempData.diagnosis,
+      prescription: tempData.prescription
+    });
+
+    const card = document.createElement('div');
+    card.className = 'visit-card';
+    card.innerHTML = `
+      <div class="vc-header">
+        <span>🩺 Visit Recorded — ${tempData.patientName} (PID #${tempData.patientID})</span>
+        <span>Visit #${visitNum}</span>
+      </div>
+      <div class="vc-body">
+        <span class="vc-label">Patient ID</span>    <span class="vc-value">${tempData.patientID}</span>
+        <span class="vc-label">Patient Name</span>  <span class="vc-value">${tempData.patientName}</span>
+        <span class="vc-label">Visit Date</span>    <span class="vc-value">${tempData.date}</span>
+        <span class="vc-label">Diagnosis</span>     <span class="vc-value vv-diag">${tempData.diagnosis}</span>
+        <span class="vc-label">Prescription</span>  <span class="vc-value vv-rx">${tempData.prescription}</span>
+      </div>`;
+    terminal.appendChild(card);
+    terminal.scrollTop = terminal.scrollHeight;
+    updateStats();
+    state = 'MENU'; showMenu();
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+//  3. SEARCH PATIENT + VISIT HISTORY
+// ═══════════════════════════════════════════════════════
+function handleSearch(val) {
+  const id      = val.trim();
+  const patient = patients.find(p => p.patientID === id);
+
+  if (!patient) {
+    pE('Patient ID ' + id + ' not found in the registry.');
+    state = 'MENU'; showMenu(); return;
+  }
+
+  const patientVisits = visits.filter(v => v.patientID === id);
+
+  // Patient profile card
+  const pcard = document.createElement('div');
+  pcard.className = 'patient-card';
+  pcard.innerHTML = `
+    <div class="pc-header">
+      <span>✚ Patient Record</span>
+      <span class="pc-id-badge">PID #${patient.patientID}</span>
+    </div>
+    <div class="pc-body">
+      <span class="pc-label">Patient ID</span>   <span class="pc-value cv-id">${patient.patientID}</span>
+      <span class="pc-label">Name</span>          <span class="pc-value cv-name">${patient.name}</span>
+      <span class="pc-label">Age</span>           <span class="pc-value">${patient.age} yrs</span>
+      <span class="pc-label">Phone</span>         <span class="pc-value">${patient.phone}</span>
+      <span class="pc-label">Total Visits</span>  <span class="pc-value cv-visits">${patientVisits.length}</span>
+    </div>
+    <div class="pc-footer">
+      <span>Status: REGISTERED ✓</span>
+      <span>${patientVisits.length} visit(s) on record</span>
+    </div>`;
+  terminal.appendChild(pcard);
+  terminal.scrollTop = terminal.scrollHeight;
+
+  if (patientVisits.length === 0) {
+    print('  No visit records found for this patient.', 'lo');
+  } else {
+    const lbl = document.createElement('span');
+    lbl.className = 'section-lbl';
+    lbl.textContent = 'Visit History — ' + patientVisits.length + ' record' + (patientVisits.length !== 1 ? 's' : '');
+    terminal.appendChild(lbl);
+
+    patientVisits.forEach((v, i) => {
+      const vc = document.createElement('div');
+      vc.className = 'visit-card';
+      vc.innerHTML = `
+        <div class="vc-header">
+          <span>🩺 Visit #${i + 1}</span>
+          <span>${v.date}</span>
+        </div>
+        <div class="vc-body">
+          <span class="vc-label">Date</span>          <span class="vc-value">${v.date}</span>
+          <span class="vc-label">Diagnosis</span>     <span class="vc-value vv-diag">${v.diagnosis}</span>
+          <span class="vc-label">Prescription</span>  <span class="vc-value vv-rx">${v.prescription}</span>
+        </div>`;
+      terminal.appendChild(vc);
+    });
+  }
+
+  terminal.scrollTop = terminal.scrollHeight;
+  state = 'MENU'; showMenu();
+}
+
+// ═══════════════════════════════════════════════════════
+//  4. FREQUENT VISITORS REPORT  (patients with > N visits)
+// ═══════════════════════════════════════════════════════
+function handleFrequent(val) {
+  const n = parseInt(val);
+  if (isNaN(n) || n < 0) {
+    pE('Please enter a valid non-negative number.'); print('Enter N:'); return;
+  }
+
+  const result = patients
+    .map(p => ({
+      ...p,
+      visitCount: visits.filter(v => v.patientID === p.patientID).length
+    }))
+    .filter(p => p.visitCount > n)
+    .sort((a, b) => b.visitCount - a.visitCount);
+
+  if (result.length === 0) {
+    print('  No patients found with more than ' + n + ' visit(s).', 'lo');
+    state = 'MENU'; showMenu(); return;
+  }
+
+  let rows = '';
+  result.forEach(p => {
+    rows += `<tr>
+      <td class="td-pid">${p.patientID}</td>
+      <td class="td-name">${p.name}</td>
+      <td>${p.age} yrs</td>
+      <td>${p.phone}</td>
+      <td class="td-visits">${p.visitCount}</td>
+    </tr>`;
+  });
+
+  const block = document.createElement('div');
+  block.className = 't-block';
+  block.innerHTML = `
+    <table>
+      <thead><tr>
+        <th>Patient ID</th>
+        <th>Name</th>
+        <th>Age</th>
+        <th>Phone</th>
+        <th>Total Visits</th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+  terminal.appendChild(block);
+  pOK('  ✓ ' + result.length + ' patient(s) with more than ' + n + ' visit(s).');
+  terminal.scrollTop = terminal.scrollHeight;
+  state = 'MENU'; showMenu();
+}
+
+// ═══════════════════════════════════════════════════════
+//  5. MONTHLY VISITS REPORT
+// ═══════════════════════════════════════════════════════
+function monthlyReport() {
+  const now       = new Date();
+  const month     = now.getMonth();
+  const year      = now.getFullYear();
+  const monthName = now.toLocaleString('default', { month: 'long' });
+
+  print('');
+  pH('— Monthly Visits Report — ' + monthName + ' ' + year + ' ——————');
+
+  const thisMonth = visits.filter(v => {
+    const d = new Date(v.date);
+    return d.getMonth() === month && d.getFullYear() === year;
+  });
+
+  if (thisMonth.length === 0) {
+    print('  No visits recorded in ' + monthName + ' ' + year + '.', 'lo');
+    return;
+  }
+
+  // Group by patient
+  const grouped = {};
+  thisMonth.forEach(v => {
+    if (!grouped[v.patientID]) grouped[v.patientID] = [];
+    grouped[v.patientID].push(v);
+  });
+
+  let rows = '';
+  Object.entries(grouped).forEach(([pid, pvs]) => {
+    const patient = patients.find(p => p.patientID === pid);
+    const name    = patient ? patient.name : '(unknown)';
+    rows += `<tr>
+      <td class="td-pid">${pid}</td>
+      <td class="td-name">${name}</td>
+      <td class="td-visits">${pvs.length}</td>
+      <td style="color:var(--muted);white-space:normal">${pvs.map(v => v.date).join(', ')}</td>
+    </tr>`;
+  });
+
+  rows += `<tr style="border-top:2px solid var(--blue)">
+    <td colspan="2" style="color:var(--blue);font-weight:700;font-family:var(--mono);letter-spacing:1px">TOTAL</td>
+    <td class="td-visits" style="font-size:1.05em">${thisMonth.length}</td>
+    <td style="color:var(--muted)">visits in ${monthName}</td>
+  </tr>`;
+
+  const block = document.createElement('div');
+  block.className = 't-block';
+  block.innerHTML = `
+    <table>
+      <thead><tr>
+        <th>Patient ID</th>
+        <th>Patient Name</th>
+        <th>Visits</th>
+        <th>Dates</th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+  terminal.appendChild(block);
+  pOK('  ✓ Total visits in ' + monthName + ' ' + year + ': ' + thisMonth.length);
+  terminal.scrollTop = terminal.scrollHeight;
+  updateStats();
+}
+
+// ═══════════════════════════════════════════════════════
+//  INPUT EVENTS
+// ═══════════════════════════════════════════════════════
+function quickSend(val) {
+  inputEl.value = '';
+  handleInput(val);
+  inputEl.focus();
+}
+
+sendBtn.addEventListener('click', () => {
+  const v = inputEl.value; inputEl.value = ''; handleInput(v); inputEl.focus();
+});
+inputEl.addEventListener('keydown', e => {
+  if (e.key === 'Enter') { const v = inputEl.value; inputEl.value = ''; handleInput(v); }
+});
+
+// ═══════════════════════════════════════════════════════
+//  BOOT
+// ═══════════════════════════════════════════════════════
+print('');
+pH('  MediCare HMS — Clinic Register');
+pH('  ───────────────────────────────────────────');
+print('  class Patient      { patientID, name, age, phone }', 'lo');
+print('  class Visit        { patientID, date, diagnosis, prescription }', 'lo');
+print('  class HospitalSystem uses vector<Patient>, vector<Visit>', 'lo');
+print('');
+print('  Initialising patient registry...', 'lo');
+
+setTimeout(() => {
+  pOK('  ✓  Patient registry initialised');
+  pOK('  ✓  Visit record store initialised');
+  pOK('  ✓  All systems ready');
+  setTimeout(() => { showMenu(); }, 300);
+}, 500);
+</script>
+</body>
+</html>
